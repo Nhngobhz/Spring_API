@@ -1,12 +1,26 @@
-# Stage 1: Build
+# Stage 1: Build the application using Gradle
 FROM eclipse-temurin:17-jdk-alpine AS build
-COPY . .
-# This line ensures the script has permission to run inside the container
-RUN chmod +x mvnw
-RUN ./mvnw clean package -DskipTests
+WORKDIR /app
 
-# Stage 2: Run
+# Copy the Gradle wrapper and configuration files first (for caching)
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle .
+COPY settings.gradle .
+
+# Give permission to execute the wrapper
+RUN chmod +x gradlew
+
+# Copy the source code
+COPY src src
+
+# Build the application
+RUN ./gradlew clean bootJar -x test
+
+# Stage 2: Run the application
 FROM eclipse-temurin:17-jre-alpine
-COPY --from=build /target/*.jar app.jar
+WORKDIR /app
+# Gradle puts the jar in build/libs/ instead of target/
+COPY --from=build /app/build/libs/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
