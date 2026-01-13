@@ -23,7 +23,7 @@ public class MyConfi implements WebMvcConfigurer {
         // Explicitly define the server URL for Swagger UI API calls
     
         Server productionServer = new Server();
-        productionServer.setUrl(""); // Set to your production server URL
+        productionServer.setUrl("https://spring-api-1eyj.onrender.com"); // Set to your production server URL
         productionServer.setDescription("Production Server");
 
         // You can add other servers (e.g., a local HTTP one for development)
